@@ -31,8 +31,26 @@ https://github.com/user-attachments/assets/450cc73b-5316-46ea-a091-278690f4689d
 
 ---
 
+## 🚀 NEW: SDK Integration
+
+**Automate the pipeline programmatically** with Claude Agent SDK!
+
+```bash
+# Install SDK
+pip install claude-agent-sdk
+
+# Set API key
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Run automated pipeline
+./run_sdk_demo.sh
+```
+
+**📖 Documentation:** [SDK_README.md](./SDK_README.md)
+
 ## 📚 Table of Contents
 
+- [NEW: SDK Integration](#-new-sdk-integration)
 - [See It In Action](#-see-it-in-action)
 - [High-Level Architecture](#-high-level-architecture)
 - [Pipeline Results](#-pipeline-results)

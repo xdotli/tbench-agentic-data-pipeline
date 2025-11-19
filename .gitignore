@@ -20,4 +20,12 @@ __pychache__/
 *.swo
 *.bak
 *.tmp
-*.orig 
+*.orig
+.env
+sdk_demo_output/
+test_api_key.py
+
+# Harbor test outputs
+jobs/
+harbor_*.log
+*_test.log
