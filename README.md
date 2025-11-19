@@ -1,6 +1,15 @@
 # 🤖 Terminal Bench Agentic Data Pipeline
 
-**TL;DR:** I built a multi-agent system with 20+ Claude Code instances working in parallel to generate high-quality training data for terminal-based coding tasks, producing 331+ validated datapoints for my [scalable RL training project](https://github.com/Danau5tin/terminal-bench-rl).
+**TL;DR:** A multi-agent system with 20+ Claude Code instances working in parallel to generate high-quality training data for terminal-based coding tasks, with focus on **backend software engineering** scenarios.
+
+**Primary Focus: Backend Software Engineering**
+
+This pipeline generates repository-level, realistic backend engineering tasks including:
+- API development (REST, GraphQL, WebSocket)
+- Database operations, migrations, and query optimization
+- Debugging and refactoring in complex codebases
+- Testing infrastructure (unit, integration, end-to-end)
+- Real-world developer scenarios targeting ~20% pass rate on SOTA models
 
 **Why build an agentic data pipeline?**
 
@@ -52,32 +61,38 @@ All agents work independently in parallel, coordinated by a central Task Manager
 
 ---
 
-## 📈 Pipeline Results
+## 📈 Pipeline Configuration
 
-### Production Output
-- **331 validated datapoints** generated
-- **20+ agents** working concurrently
-- **3 specialized agent types** with distinct roles
-- **100% Docker-validated** environments
+### Backend Engineering Focus
+- **Target Difficulty**: ~20% pass rate on SOTA models
+- **Languages**: Python, JavaScript, TypeScript
+- **Frameworks**: FastAPI, Flask, Django, Express.js, NestJS
+- **Databases**: PostgreSQL, MySQL, MongoDB, Redis
+- **Task Complexity**: Repository-level, multi-file codebases
+- **Scenario Types**: Real-world developer tasks (not toy projects)
 
-### Datapoint Categories Generated
+### Supported Categories
 
-| Category | Count | Description |
-|----------|-------|-------------|
-| Software Engineering | 97 | API development, CLI tools, code architecture |
-| System Administration | 59 | Server config, process management, monitoring |
-| Security | 42 | Vulnerability fixes, authentication, encryption |
-| Data Processing | 37 | ETL pipelines, data parsing, transformations |
-| Debugging | 28 | Fix race conditions, memory leaks, logic errors |
-| Machine Learning | 17 | Model training, data preprocessing, evaluation |
-| File Operations | 15 | File parsing, I/O optimization, format conversion |
-| Scientific Computing | 15 | Numerical methods, simulations, data analysis |
+| Category | Description |
+|----------|-------------|
+| API Development | REST APIs, GraphQL, WebSocket servers, middleware |
+| Backend Engineering | Microservices, server-side processing, concurrency |
+| Database Engineering | Migrations, schema design, query optimization |
+| Code Refactoring | Legacy code improvement, architecture changes |
+| Debugging | Multi-file bugs, race conditions, performance issues |
+| Integration Testing | Test infrastructure, mocking, fixtures |
+| Microservices | Multi-service architectures, service communication |
+| Security | Authentication, authorization, input validation |
+| Software Engineering | General engineering practices, design patterns |
+| Testing Infrastructure | Unit, integration, E2E test workflows |
+| Web Development | Full-stack features, server-side rendering |
 
-### Most Common Technologies
-- **Python**: Used in 196 datapoints (59%)
-- **CLI Tools**: 47 datapoints
-- **APIs**: 30 datapoints
-- **C**: 22 datapoints
+### Backend Technology Stack
+- **Python**: FastAPI, Flask, Django, SQLAlchemy, Pytest
+- **JavaScript/TypeScript**: Express.js, NestJS, Node.js, Jest, Mocha
+- **Databases**: PostgreSQL, MySQL, MongoDB, Redis, ORMs
+- **Testing**: Pytest, Jest, Mocha, integration test frameworks
+- **DevOps**: Docker containers, CI/CD workflows
 
 ---
 

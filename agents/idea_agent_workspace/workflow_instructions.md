@@ -13,6 +13,15 @@ The datapoints you help create will be used in RL training runs for an AI agent 
 - Uses tools like bash, file operations, and search without user interaction
 - Must plan, explore, execute, and verify solutions independently
 
+**PRIMARY FOCUS: Backend Software Engineering**
+- API development (REST, GraphQL, WebSocket)
+- Database operations, migrations, and query optimization
+- Debugging and refactoring in complex, repository-level codebases
+- Testing workflows (unit, integration, end-to-end)
+- Real-world developer scenarios (not toy projects)
+- Target difficulty: ~20% pass rate on SOTA models
+- Languages: Python, JavaScript, TypeScript (primary focus)
+
 ## Critical Understanding
 - **Diversity is Essential**: Never recreate the eval DP or similar variants. The training value comes from exposing the model to diverse scenarios that test the same core capabilities in different contexts.
 - **You Create Specifications, Not Implementations**: Focus on high-level descriptions of what should be built, not the actual code or tests.
@@ -129,11 +138,23 @@ Then generate creative task variations that test the same core capabilities in d
 ### Brainstorming Guidelines
 - **Quantity**: Generate n × multiplier ideas based on the parameters returned
 - **Format**: Use the structured format below for each idea
+- **Backend Focus**: Prioritize realistic backend engineering scenarios:
+  - API development and microservices architecture
+  - Database design, migrations, query optimization
+  - Authentication/authorization systems
+  - Caching strategies and performance optimization
+  - Integration testing and test infrastructure
+  - Debugging complex multi-file repositories
+  - Refactoring legacy backend code
+  - Server-side data processing and validation
 - **Diversity**: Ensure variety across:
-  - Difficulty levels (medium, hard, extremely hard)
-  - Industry domains
-  - Task types (debugging, building, refactoring, configuring)
-  - Tech stacks (use the techstack of the evaldp, or use as part of a larger tech stack (add in some other stuff), or use similar tech stack)
+  - Difficulty levels (medium, hard, extremely hard) - target ~20% pass rate on SOTA
+  - Industry domains (e-commerce, fintech, SaaS, social platforms, etc.)
+  - Task types (debugging, building, refactoring, configuring, migrating)
+  - Tech stacks: Python, JavaScript, TypeScript with frameworks like FastAPI, Flask, Django, Express, NestJS
+  - Database technologies: PostgreSQL, MySQL, MongoDB, Redis
+- **Repository-Level Complexity**: Focus on multi-file, realistic codebases, not single-function problems
+- **Real Developer Scenarios**: Think about what mid-senior engineers encounter daily
 
 ### Required Brainstorming Format
 Each idea must follow this structure:
@@ -159,6 +180,49 @@ Idea #[number]:
 - Introduce realistic constraints (performance, security, compatibility)
 - Ensure these are multi-step problems that build complexity
 - Think about common real-world scenarios developers face
+
+### Backend Engineering Scenario Ideas
+When brainstorming, consider these realistic backend scenarios:
+
+**API & Web Services:**
+- Building new endpoints with proper validation, error handling, authentication
+- Debugging performance issues (N+1 queries, memory leaks, slow responses)
+- Implementing rate limiting, caching, pagination
+- Adding WebSocket/real-time features to existing APIs
+- Migrating between API versions or frameworks
+- Implementing proper logging and monitoring
+
+**Database & Data:**
+- Writing and optimizing complex queries (joins, aggregations, subqueries)
+- Designing and executing schema migrations
+- Implementing database transactions and handling race conditions
+- Adding proper indexes for performance
+- Debugging data consistency issues
+- Implementing connection pooling and query optimization
+
+**Testing & Quality:**
+- Adding comprehensive test coverage to untested code
+- Debugging and fixing flaky tests
+- Setting up integration test infrastructure with database mocking
+- Implementing end-to-end test workflows
+- Debugging CI/CD pipeline failures
+- Adding proper test fixtures and factories
+
+**Architecture & Refactoring:**
+- Breaking down monolithic code into modular components
+- Extracting shared logic into reusable middleware/utilities
+- Improving code organization and dependency management
+- Implementing design patterns (repository, factory, strategy)
+- Refactoring for testability and maintainability
+- Managing technical debt in legacy codebases
+
+**Security & Production:**
+- Implementing authentication (JWT, OAuth, sessions)
+- Adding authorization and role-based access control
+- Fixing security vulnerabilities (SQL injection, XSS, CSRF)
+- Implementing secure password hashing and token management
+- Adding input validation and sanitization
+- Implementing proper error handling without leaking sensitive info
 
 ## Step 4: Get Refinement Criteria
 ```bash
@@ -308,13 +372,42 @@ python data_pipeline.py complete {original_task_id} --status completed
 
 ### Bad Example
 Eval DP: "Fix a bug in a Python Flask API endpoint"
-Bad Idea: "Fix a bug in a Python Django API endpoint" 
+Bad Idea: "Fix a bug in a Python Django API endpoint"
 ❌ Too similar - just swapped frameworks
 
-### Good Example  
-Eval DP: "Fix a bug in a Python Flask API endpoint" -> dockerfile shows it is a race condition.
-Good Idea: "Debug a race condition in a Go microservice message queue consumer"
-✅ Tests same debugging skills in completely different context
+### Good Examples for Backend Engineering
+
+**Example 1: Database Performance**
+Eval DP: "Optimize a slow SQL query in a reporting system"
+Good Ideas:
+- ✅ "Debug and fix N+1 query problem in an Express.js ORM-based e-commerce API"
+- ✅ "Add proper indexing and query optimization to a FastAPI user search endpoint"
+- ✅ "Refactor a TypeScript API with inefficient database joins causing timeout issues"
+Why: Tests query optimization skills across different languages and contexts
+
+**Example 2: API Development**
+Eval DP: "Build a REST API endpoint with validation"
+Good Ideas:
+- ✅ "Implement rate limiting and authentication for an existing Express API"
+- ✅ "Add comprehensive error handling and input validation to a FastAPI microservice"
+- ✅ "Debug and fix a WebSocket connection handler with race conditions in Node.js"
+Why: Tests API design and error handling in realistic scenarios
+
+**Example 3: Testing & Quality**
+Eval DP: "Write unit tests for a data processing function"
+Good Ideas:
+- ✅ "Add integration tests for a multi-service authentication flow with database mocking"
+- ✅ "Debug flaky tests in a CI/CD pipeline for an Express.js API"
+- ✅ "Implement end-to-end tests for a payment processing workflow"
+Why: Tests testing infrastructure and debugging skills at system level
+
+**Example 4: Repository-Level Refactoring**
+Eval DP: "Refactor a monolithic function into smaller pieces"
+Good Ideas:
+- ✅ "Migrate a Python Flask monolith to microservices architecture with shared database"
+- ✅ "Refactor tightly-coupled TypeScript modules to improve testability"
+- ✅ "Extract a reusable authentication middleware from duplicated code across API routes"
+Why: Tests architectural thinking and complex refactoring skills
 
 # File Management
 

@@ -42,6 +42,15 @@ You ensure only high-quality training datapoints reach the production dataset. T
 - Uses tools like bash, file operations, and search without user interaction
 - Must plan, explore, execute, and verify solutions independently
 
+**PRIMARY FOCUS: Backend Software Engineering**
+Prioritize datapoints that emphasize:
+- **Realistic Backend Scenarios**: API development, database work, testing infrastructure
+- **Repository-Level Complexity**: Multi-file codebases, not single-function problems
+- **Real Developer Tasks**: Debugging, refactoring, migrations, performance optimization
+- **Target Difficulty**: ~20% pass rate on SOTA models (not too easy!)
+- **Languages**: Python, JavaScript, TypeScript with backend frameworks
+- **Practical Skills**: Authentication, database queries, testing, error handling
+
 ## Critical Understanding
 - **Quality Gatekeeper**: You are the final quality check before production
 - **Full Edit Authority**: You can and should patch any aspect of the datapoint to meet standards
@@ -307,13 +316,19 @@ python agents/review_agent_workspace/cancel_datapoint.py \
 - **Realistic**: Sounds like actual developer asking for help mid-task
 - **Has Requirements**: If specific metrics matter (performance, coverage), they're included
 
-### Good Examples:
+### Good Backend Engineering Examples:
 - "The auth endpoint times out with 100+ users. Fix it to handle at least 500 concurrent."
 - "Add caching to the product API - need 80%+ hit rate for common queries."
+- "Need to add rate limiting - 100 req/min per user with proper 429 responses."
+- "The N+1 query in user search is killing us. Fix it to run under 200ms."
+- "Implement DB migration for the subscriptions table with proper foreign keys."
+- "Add integration tests for auth flow - mock the DB and test token generation."
 
 ### Bad Examples:
 - "Please fix the authentication system to properly handle concurrent users" (too formal)
 - "Fix the race condition in the login handler" (gives away the problem)
+- "Write a hello world API" (too simple, not repository-level)
+- "Create a sorting algorithm" (not backend engineering focus)
 
 ## Dockerfile Quality
 - **Base Images**: Should use t-bench images when possible:
@@ -340,12 +355,22 @@ python agents/review_agent_workspace/cancel_datapoint.py \
 - **Match Functions**: All test names in weights exist in tests
 
 ## Difficulty Accuracy
-- **easy**: Simple tasks a junior could handle
-- **medium**: Standard tasks requiring competent engineer
-- **hard**: Complex tasks needing senior engineer
-- **extremely_hard**: Expert-level with multiple complex subtasks
+For backend engineering tasks targeting ~20% SOTA pass rate:
+- **easy**: Simple tasks a junior could handle (AVOID - too easy for our target)
+- **medium**: Standard tasks requiring competent engineer (acceptable baseline)
+- **hard**: Complex tasks needing mid-senior engineer (preferred)
+- **extremely_hard**: Expert-level with multiple complex subtasks (ideal for high-value scenarios)
 
-If difficulty seems wrong, patch it.
+**Backend Difficulty Guidelines:**
+- Simple CRUD with no complexity → **medium** (or reject as too simple)
+- API with auth/validation/error handling → **hard**
+- Database migrations with data integrity → **hard**
+- Performance optimization (N+1, caching) → **hard**
+- Multi-service integration testing → **hard** to **extremely_hard**
+- Complex refactoring with architectural changes → **extremely_hard**
+- Debugging race conditions in concurrent systems → **extremely_hard**
+
+If difficulty seems wrong, patch it. Prefer **hard** and **extremely_hard** for production quality.
 
 ## Integration Quality
 - **Cohesive**: All components work together
@@ -360,6 +385,25 @@ If difficulty seems wrong, patch it.
 - **Docker Commands**: Task involves Docker operations (already in container)
 - **Browser Required**: Task needs web browser interaction
 - **Non-Deterministic Tests**: Tests depend on external state/timing
+
+## Backend Engineering Specific Cancellation Criteria
+Consider canceling if:
+- **Too Simple**: Single-function problem solvable in <10 turns
+- **Tutorial-Level**: Task is too similar to common beginner tutorials
+- **Not Repository-Level**: Doesn't involve multi-file codebase complexity
+- **Trivial CRUD**: Basic create/read/update/delete with no interesting complexity
+- **Function-Level Only**: Task doesn't require understanding broader architecture
+- **Wrong Focus**: Task focuses on algorithms/math instead of backend engineering
+
+## High-Value Backend Tasks (Prefer to Approve)
+Prioritize datapoints with:
+- **Multi-file complexity**: Requires navigating and understanding codebase structure
+- **Database operations**: Schema design, migrations, query optimization
+- **API development**: Authentication, validation, error handling, rate limiting
+- **Testing infrastructure**: Integration tests, mocking, test fixtures
+- **Performance issues**: N+1 queries, caching strategies, concurrency
+- **Real debugging scenarios**: Race conditions, production bugs, edge cases
+- **Architecture changes**: Refactoring, module extraction, design patterns
 
 ## Unfixable Issues (after attempts)
 - **Tests Can't Verify**: No programmatic way to check success

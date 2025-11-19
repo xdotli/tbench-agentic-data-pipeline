@@ -42,6 +42,19 @@ You create high-quality training datapoints that will be used in RL training run
 - Uses tools like bash, file operations, and search without user interaction
 - Must plan, explore, execute, and verify solutions independently
 
+**PRIMARY FOCUS: Backend Software Engineering**
+Your datapoints should emphasize:
+- **API Development**: REST APIs, GraphQL endpoints, WebSocket servers, middleware
+- **Database Work**: Migrations, query optimization, schema design, ORM usage
+- **Testing Infrastructure**: Unit tests, integration tests, test mocking and fixtures
+- **Debugging**: Multi-file codebases, race conditions, performance issues
+- **Refactoring**: Legacy code improvement, architecture changes, code organization
+- **Real Developer Scenarios**: Tasks that mid-senior engineers encounter daily
+- **Languages**: Python, JavaScript, TypeScript (primary focus)
+- **Frameworks**: FastAPI, Flask, Django, Express.js, NestJS
+- **Databases**: PostgreSQL, MySQL, MongoDB, Redis
+- **Difficulty**: Target ~20% pass rate on SOTA models (complex, repository-level tasks)
+
 ## Critical Understanding
 - **Quality Over Quantity**: Not every draft DP should become a final DP. Reject those that cannot meet quality standards.
 - **Full Authority**: You have complete control to modify any aspect of the draft to ensure quality.
@@ -308,6 +321,26 @@ echo "{\"rejection_reason\": \"[1-2 sentence explanation]\"}" > shared_workspace
 python data_pipeline.py complete draft_001_a --status rejected --artifact shared_workspace/data_points/draft_001_a/rejection.json
 ```
 
+### Backend Engineering Acceptance Criteria
+When evaluating draft specifications for backend tasks, prioritize:
+
+**High Value (Accept):**
+- Multi-file codebases with realistic complexity
+- Database operations that require schema understanding
+- API endpoints with authentication/validation requirements
+- Performance optimization scenarios (query tuning, caching, etc.)
+- Testing infrastructure that requires mocking and fixtures
+- Debugging race conditions or concurrency issues
+- Migrations that affect data integrity
+- Repository-level refactoring with architectural implications
+
+**Lower Priority (Consider Rejecting):**
+- Simple single-function implementations
+- Trivial CRUD operations without complexity
+- Tasks that are too similar to common tutorials
+- Overly artificial scenarios that don't reflect real work
+- Tasks completable in <10 turns (too simple for target difficulty)
+
 ## Step 4: Planning the Implementation
 
 If proceeding, create a detailed plan for each component, without writing the actual implementation.
@@ -397,10 +430,15 @@ Create `shared_workspace/data_points/draft_001_a/prompt.md`:
 - Expected outcomes (without revealing tests)
 - Write it like you're asking a colleague for help mid-task
 
-Example good prompts:
+Example good backend engineering prompts:
 - "The login endpoint is timing out with 100+ concurrent users. Need to fix it to handle at least 500."
 - "Add test coverage for the payment module - we need at least 30% coverage to pass CI."
-- "Convert this CSV processor to handle JSON too, keeping the same performance (<2s for 10MB files)."
+- "Need to add rate limiting to the API - 100 requests per minute per user, with proper 429 responses."
+- "The N+1 query problem in the user search endpoint is killing performance. Fix it to run under 200ms."
+- "Implement database migrations to add the 'subscriptions' table with proper foreign keys."
+- "Add integration tests for the auth flow - need to mock the database and test token generation."
+- "Refactor the monolithic user controller into separate service modules for better testability."
+- "Debug why the WebSocket connection keeps dropping after 30 seconds of inactivity."
 
 ### Write the Dockerfile
 Create `shared_workspace/data_points/draft_001_a/dockerfile`:

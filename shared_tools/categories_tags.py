@@ -5,38 +5,64 @@ This module provides the canonical source of valid categories and tags
 used throughout the data generation pipeline.
 """
 
-# Valid categories for datapoints
+# Valid categories for datapoints - focused on backend software engineering
 VALID_CATEGORIES = [
-    "data-processing",
-    "data-science",
+    "api-development",
+    "backend-engineering",
+    "code-refactoring",
+    "database-engineering",
     "debugging",
-    "file-operations",
-    "games",
-    "machine-learning",
-    "mathematics",
-    "model-training",
-    "scientific-computing",
+    "integration-testing",
+    "microservices",
     "security",
     "software-engineering",
-    "system-administration"
+    "testing-infrastructure",
+    "web-development"
 ]
 
-# Valid tags for datapoints
+# Valid tags for datapoints - focused on backend software engineering
 VALID_TAGS = [
-    "C", "RL", "algorithm-implementation", "algorithms", "analysis",
-    "api", "audio-processing", "automation", "base64", "binary-processing",
-    "build-automation", "caching", "cli", "cloud", "coding",
-    "compiler-migration", "compression", "data", "data-extraction", "data-processing",
-    "data-science", "debugging", "decrypt", "encryption", "file-operations",
-    "file-recovery", "forensics", "games", "git", "images",
-    "information-retrieval", "interactive", "logic", "long-context", "machine-learning",
-    "mathematics", "maze", "model-training", "multiprocessing", "networking",
-    "numpy", "optimization", "package-management", "parallel-computing", "pathfinding",
-    "pattern-recognition", "performance-optimization", "physics", "python", "pytorch",
-    "reinforcement-learning", "scheduling", "scientific-computation", "security", "signal-processing",
-    "software-engineering", "software-installation", "string-manipulation", "synchronization", "sys-admin",
-    "system", "text-processing", "troubleshooting", "unit-testing", "version-control",
-    "web", "web-scraping", "web-server"
+    # Languages
+    "python", "javascript", "typescript",
+
+    # Backend frameworks & libraries
+    "express", "fastapi", "flask", "django", "nestjs", "nodejs",
+
+    # API & Web
+    "api", "rest-api", "graphql", "websocket", "http", "middleware",
+    "routing", "web-server", "microservices", "server-side",
+
+    # Database
+    "database", "sql", "nosql", "postgresql", "mysql", "mongodb",
+    "redis", "orm", "prisma", "sequelize", "sqlalchemy",
+    "query-optimization", "schema-design", "migration", "transactions",
+
+    # Testing
+    "unit-testing", "integration-testing", "e2e-testing", "test-automation",
+    "pytest", "jest", "mocha", "testing-framework",
+
+    # Development practices
+    "debugging", "refactoring", "code-quality", "error-handling",
+    "logging", "monitoring", "performance-optimization",
+
+    # DevOps & Infrastructure
+    "docker", "containers", "ci-cd", "deployment", "environment-config",
+
+    # Backend patterns & concepts
+    "authentication", "authorization", "caching", "async", "concurrency",
+    "rate-limiting", "validation", "serialization", "pagination",
+
+    # Tools & Version Control
+    "git", "version-control", "package-management", "npm", "pip",
+
+    # Data & Processing
+    "data-processing", "json", "csv", "file-operations", "streaming",
+
+    # Security
+    "security", "encryption", "jwt", "oauth", "input-validation",
+
+    # System & CLI
+    "cli", "automation", "scripting", "build-automation"
 ]
 
 
