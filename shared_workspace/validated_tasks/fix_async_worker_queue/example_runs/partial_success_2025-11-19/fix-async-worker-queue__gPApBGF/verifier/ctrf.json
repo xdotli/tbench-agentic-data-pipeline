@@ -1,0 +1,122 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 11,
+            "passed": 10,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1763593002.137962,
+            "stop": 1763593016.4983156
+        },
+        "tests": [
+            {
+                "name": "test_state.py::test_health_endpoint",
+                "status": "passed",
+                "duration": 0.007046208993415348,
+                "start": 1763593002.2473817,
+                "stop": 1763593002.2545679,
+                "retries": 0,
+                "file_path": "test_state.py"
+            },
+            {
+                "name": "test_state.py::test_workers_are_started",
+                "status": "passed",
+                "duration": 0.004516419998253696,
+                "start": 1763593002.2547,
+                "stop": 1763593002.2594233,
+                "retries": 0,
+                "file_path": "test_state.py"
+            },
+            {
+                "name": "test_state.py::test_submit_job",
+                "status": "passed",
+                "duration": 0.005405821997555904,
+                "start": 1763593002.2595444,
+                "stop": 1763593002.2651818,
+                "retries": 0,
+                "file_path": "test_state.py"
+            },
+            {
+                "name": "test_state.py::test_get_job_status_exists",
+                "status": "passed",
+                "duration": 0.005862145990249701,
+                "start": 1763593002.2653253,
+                "stop": 1763593002.2713823,
+                "retries": 0,
+                "file_path": "test_state.py"
+            },
+            {
+                "name": "test_state.py::test_get_job_status_not_found",
+                "status": "passed",
+                "duration": 0.004215049993945286,
+                "start": 1763593002.2715046,
+                "stop": 1763593002.275821,
+                "retries": 0,
+                "file_path": "test_state.py"
+            },
+            {
+                "name": "test_state.py::test_job_gets_processed",
+                "status": "passed",
+                "duration": 2.030907238018699,
+                "start": 1763593002.2759202,
+                "stop": 1763593004.3075068,
+                "retries": 0,
+                "file_path": "test_state.py"
+            },
+            {
+                "name": "test_state.py::test_job_status_transitions",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.014970318996347487,
+                "start": 1763593004.308059,
+                "stop": 1763593004.3435385,
+                "retries": 0,
+                "file_path": "test_state.py",
+                "trace": "client = <httpx.Client object at 0xffff82e4b890>\n\n    def test_job_status_transitions(client):\n        \"\"\"Test that job status transitions through correct states\"\"\"\n        submit_response = client.post(\n            \"/submit\",\n            params={\"task_type\": \"status_test\", \"data\": {\"check\": \"transitions\"}}\n        )\n        job_id = submit_response.json()[\"job_id\"]\n    \n        # Initial state should be pending\n        initial_response = client.get(f\"/status/{job_id}\")\n        initial_status = initial_response.json()[\"status\"]\n>       assert initial_status == \"pending\", \"Initial status should be pending\"\nE       AssertionError: Initial status should be pending\nE       assert 'processing' == 'pending'\nE         \nE         - pending\nE         + processing\n\n/tests/test_state.py:99: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_state.py::test_completed_at_timestamp",
+                "status": "passed",
+                "duration": 2.0346439219865715,
+                "start": 1763593004.3437524,
+                "stop": 1763593006.3787274,
+                "retries": 0,
+                "file_path": "test_state.py"
+            },
+            {
+                "name": "test_state.py::test_multiple_jobs_concurrent",
+                "status": "passed",
+                "duration": 5.038298222003505,
+                "start": 1763593006.3790648,
+                "stop": 1763593011.4179118,
+                "retries": 0,
+                "file_path": "test_state.py"
+            },
+            {
+                "name": "test_state.py::test_queue_empties_after_processing",
+                "status": "passed",
+                "duration": 3.039861409997684,
+                "start": 1763593011.4182432,
+                "stop": 1763593014.4589987,
+                "retries": 0,
+                "file_path": "test_state.py"
+            },
+            {
+                "name": "test_state.py::test_job_data_preserved",
+                "status": "passed",
+                "duration": 2.0374721640109783,
+                "start": 1763593014.459594,
+                "stop": 1763593016.4977307,
+                "retries": 0,
+                "file_path": "test_state.py"
+            }
+        ]
+    }
+}

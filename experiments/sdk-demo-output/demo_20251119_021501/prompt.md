@@ -1,0 +1,1 @@
+Your Go Kafka consumer microservice is showing inventory inconsistencies under high concurrent load—products are overselling, showing negative stock, or losing updates. Debug the race condition in concurrent inventory updates and fix it by implementing proper locking, atomic operations, and idempotent message processing.

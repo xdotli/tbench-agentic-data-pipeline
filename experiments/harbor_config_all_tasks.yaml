@@ -1,0 +1,44 @@
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-sonnet-4-5
+
+tasks:
+  - path: shared_workspace/data_points/draft_dp_0ebe0379
+  - path: shared_workspace/data_points/draft_dp_0fd3f78b
+  - path: shared_workspace/data_points/draft_dp_1a67ffe0
+  - path: shared_workspace/data_points/draft_dp_2670fef8
+  - path: shared_workspace/data_points/draft_dp_2e1c5be9
+  - path: shared_workspace/data_points/draft_dp_39c98f01
+  - path: shared_workspace/data_points/draft_dp_39ddbd5d
+  - path: shared_workspace/data_points/draft_dp_3c182d00
+  - path: shared_workspace/data_points/draft_dp_401868b8
+  - path: shared_workspace/data_points/draft_dp_45e8bd02_harbor
+  - path: shared_workspace/data_points/draft_dp_52daf7c9
+  - path: shared_workspace/data_points/draft_dp_5674fe4f
+  - path: shared_workspace/data_points/draft_dp_5d768731
+  - path: shared_workspace/data_points/draft_dp_5de68e3d
+  - path: shared_workspace/data_points/draft_dp_704f847e
+  - path: shared_workspace/data_points/draft_dp_7966d32a
+  - path: shared_workspace/data_points/draft_dp_7a6e5d8f
+  - path: shared_workspace/data_points/draft_dp_7bc17d55
+  - path: shared_workspace/data_points/draft_dp_8468fe83
+  - path: shared_workspace/data_points/draft_dp_8528d001
+  - path: shared_workspace/data_points/draft_dp_8632cf1e
+  - path: shared_workspace/data_points/draft_dp_8b1b5e9f
+  - path: shared_workspace/data_points/draft_dp_96443054
+  - path: shared_workspace/data_points/draft_dp_97855721
+  - path: shared_workspace/data_points/draft_dp_9cb3138e
+  - path: shared_workspace/data_points/draft_dp_9f0eb6b1
+  - path: shared_workspace/data_points/draft_dp_a08c371e
+  - path: shared_workspace/data_points/draft_dp_acf13534
+  - path: shared_workspace/data_points/draft_dp_b38c4471
+  - path: shared_workspace/data_points/draft_dp_b6d0de8d
+  - path: shared_workspace/data_points/draft_dp_ba22b240
+  - path: shared_workspace/data_points/draft_dp_ce8f91c3
+  - path: shared_workspace/data_points/draft_dp_cfc93fde
+  - path: shared_workspace/data_points/draft_dp_d276115c
+  - path: shared_workspace/data_points/draft_dp_e21289aa
+
+job_name: sdk_v2_all_35_tasks_test
+n_attempts: 1
+timeout_multiplier: 2.0

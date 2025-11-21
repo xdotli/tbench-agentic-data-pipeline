@@ -1,0 +1,87 @@
+{
+    "id": "7eeebe7f-2b25-41ee-94d2-79e4867829aa",
+    "task_name": "fix-async-worker-queue",
+    "trial_name": "fix-async-worker-queue__gPApBGF",
+    "trial_uri": "file:///Users/suzilewie/benchflow/datagen/.conductor/accra/ashwarya-abundant-demo/jobs/2025-11-19__14-53-27/fix-async-worker-queue__gPApBGF",
+    "task_id": {
+        "path": "datasets/abundant_labs_demo/fix-async-worker-queue"
+    },
+    "source": null,
+    "task_checksum": "03cd1b8e70762e01bc5818784d3884a6c1e69dded35fb9e8ef79467727c6e58e",
+    "config": {
+        "task": {
+            "path": "datasets/abundant_labs_demo/fix-async-worker-queue",
+            "git_url": null,
+            "git_commit_id": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "fix-async-worker-queue__gPApBGF",
+        "trials_dir": "jobs/2025-11-19__14-53-27",
+        "timeout_multiplier": 1.0,
+        "agent": {
+            "name": "claude-code",
+            "import_path": null,
+            "model_name": "anthropic/claude-sonnet-4-5",
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {}
+        },
+        "environment": {
+            "type": "docker",
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "job_id": "442870a8-421c-4d91-86ab-68ff77725fdf"
+    },
+    "agent_info": {
+        "name": "claude-code",
+        "version": "unknown",
+        "model_info": {
+            "name": "claude-sonnet-4-5",
+            "provider": "anthropic"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 1114893,
+        "n_cache_tokens": 1109340,
+        "n_output_tokens": 14550,
+        "cost_usd": null,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2025-11-19T14:53:27.771881",
+    "finished_at": "2025-11-19T14:57:07.476294",
+    "environment_setup": {
+        "started_at": "2025-11-19T14:53:27.773259",
+        "finished_at": "2025-11-19T14:53:45.516942"
+    },
+    "agent_setup": {
+        "started_at": "2025-11-19T14:53:45.517659",
+        "finished_at": "2025-11-19T14:54:24.164800"
+    },
+    "agent_execution": {
+        "started_at": "2025-11-19T14:54:24.165134",
+        "finished_at": "2025-11-19T14:56:36.870765"
+    },
+    "verifier": {
+        "started_at": "2025-11-19T14:56:36.870903",
+        "finished_at": "2025-11-19T14:56:56.628194"
+    }
+}

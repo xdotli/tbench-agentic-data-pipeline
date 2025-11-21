@@ -1,0 +1,355 @@
+#!/usr/bin/env python3
+"""
+SDK-based Data Generation Pipeline
+Uses Claude Agent SDK to programmatically run the data generation pipeline.
+"""
+
+import asyncio
+import json
+import os
+import sys
+from pathlib import Path
+from typing import Optional, AsyncIterator
+from datetime import datetime
+
+from claude_agent_sdk import query, ClaudeAgentOptions
+from task_manager.task_manager import TaskManager
+
+
+class SDKPipeline:
+    """Orchestrates the data generation pipeline using Claude Agent SDK."""
+
+    def __init__(self, workspace_dir: str = None):
+        """Initialize the SDK pipeline."""
+        if workspace_dir is None:
+            workspace_dir = str(Path(__file__).parent)
+
+        self.workspace_dir = Path(workspace_dir)
+        self.task_manager = TaskManager(
+            self.workspace_dir / "state" / "generation_state.json"
+        )
+
+        # Agent workspace directories
+        self.idea_workspace = self.workspace_dir / "agents" / "idea_agent_workspace"
+        self.builder_workspace = self.workspace_dir / "agents" / "dp_builder_workspace"
+        self.review_workspace = self.workspace_dir / "agents" / "review_agent_workspace"
+
+        # Ensure API key is set
+        if not os.getenv("ANTHROPIC_API_KEY"):
+            print("⚠️  ANTHROPIC_API_KEY not set. Please set it to use the SDK.")
+            sys.exit(1)
+
+    async def run_idea_agent(self, agent_id: str = "sdk_idea_agent") -> dict:
+        """Run an idea generation agent using the SDK."""
+        print(f"\n🎨 Starting Idea Generation Agent ({agent_id})")
+        print("=" * 60)
+
+        # Get next task
+        task = self.task_manager.get_next_task(agent_id, task_types=["generate_idea"])
+
+        if not task:
+            print("No idea generation tasks available.")
+            return {"status": "no_tasks"}
+
+        task_id = task["id"]
+        print(f"📋 Claimed task: {task_id}")
+        print(f"   Type: {task['type']}")
+
+        # Read workflow instructions
+        workflow_file = self.idea_workspace / "workflow_instructions.md"
+        workflow_instructions = workflow_file.read_text()
+
+        # Build the prompt for the idea agent
+        prompt = f"""You are an Idea Generation Agent in a data generation pipeline.
+
+{workflow_instructions}
+
+Current Task ID: {task_id}
+Task Data: {json.dumps(task['data'], indent=2)}
+
+Your goal is to:
+1. Read the task parameters using the get_task_parameters.py tool
+2. Generate creative variations of the seed task
+3. Create draft specifications in the shared workspace
+
+Start working on this task now. Remember to follow the workflow instructions carefully.
+"""
+
+        # Set up agent options
+        options = ClaudeAgentOptions(
+            model="sonnet",
+            cwd=str(self.workspace_dir),
+            allowed_tools=["Read", "Write", "Bash", "Glob", "Grep", "Edit"],
+        )
+
+        # Run the agent
+        print(f"🤖 Running agent...")
+        messages = []
+        last_text = ""
+
+        try:
+            async for message in query(prompt=prompt, options=options):
+                messages.append(message)
+
+                # Print text responses
+                if hasattr(message, 'content'):
+                    for content_block in message.content:
+                        if hasattr(content_block, 'text') and content_block.text:
+                            text = content_block.text
+                            if text != last_text:
+                                print(f"   {text[:100]}...")
+                                last_text = text
+
+            print(f"✅ Agent completed. Total messages: {len(messages)}")
+
+            # Check if task was completed (we'll verify by checking shared workspace)
+            # In a real implementation, the agent would call task completion tools
+
+            return {
+                "status": "completed",
+                "task_id": task_id,
+                "message_count": len(messages)
+            }
+
+        except Exception as e:
+            print(f"❌ Error running agent: {e}")
+            # Release the task back
+            self.task_manager.release_task(task_id, agent_id)
+            return {
+                "status": "error",
+                "task_id": task_id,
+                "error": str(e)
+            }
+
+    async def run_builder_agent(self, agent_id: str = "sdk_builder_agent") -> dict:
+        """Run a datapoint builder agent using the SDK."""
+        print(f"\n🔨 Starting Datapoint Builder Agent ({agent_id})")
+        print("=" * 60)
+
+        # Get next task
+        task = self.task_manager.get_next_task(agent_id, task_types=["build_datapoint"])
+
+        if not task:
+            print("No builder tasks available.")
+            return {"status": "no_tasks"}
+
+        task_id = task["id"]
+        print(f"📋 Claimed task: {task_id}")
+
+        # Read workflow instructions
+        workflow_file = self.builder_workspace / "workflow_instructions.md"
+        workflow_instructions = workflow_file.read_text()
+
+        # Build prompt
+        prompt = f"""You are a Datapoint Builder Agent in a data generation pipeline.
+
+{workflow_instructions}
+
+Current Task ID: {task_id}
+Task Data: {json.dumps(task['data'], indent=2)}
+
+Your goal is to:
+1. Find the draft specification for this task in shared_workspace
+2. Build a complete, executable datapoint with all required files
+3. Validate it using the validation tools
+4. Add it to the review queue when complete
+
+Start working on this task now.
+"""
+
+        options = ClaudeAgentOptions(
+            model="sonnet",
+            cwd=str(self.workspace_dir),
+            allowed_tools=["Read", "Write", "Bash", "Glob", "Grep", "Edit"],
+        )
+
+        print(f"🤖 Running agent...")
+        messages = []
+
+        try:
+            async for message in query(prompt=prompt, options=options):
+                messages.append(message)
+
+                if hasattr(message, 'content'):
+                    for content_block in message.content:
+                        if hasattr(content_block, 'text') and content_block.text:
+                            print(f"   {content_block.text[:100]}...")
+
+            print(f"✅ Agent completed. Total messages: {len(messages)}")
+
+            return {
+                "status": "completed",
+                "task_id": task_id,
+                "message_count": len(messages)
+            }
+
+        except Exception as e:
+            print(f"❌ Error running agent: {e}")
+            self.task_manager.release_task(task_id, agent_id)
+            return {
+                "status": "error",
+                "task_id": task_id,
+                "error": str(e)
+            }
+
+    async def run_review_agent(self, agent_id: str = "sdk_review_agent") -> dict:
+        """Run a quality review agent using the SDK."""
+        print(f"\n🔍 Starting Quality Review Agent ({agent_id})")
+        print("=" * 60)
+
+        # Get next task
+        task = self.task_manager.get_next_task(agent_id, task_types=["review_datapoint"])
+
+        if not task:
+            print("No review tasks available.")
+            return {"status": "no_tasks"}
+
+        task_id = task["id"]
+        print(f"📋 Claimed task: {task_id}")
+
+        # Read workflow instructions
+        workflow_file = self.review_workspace / "workflow_instructions.md"
+        workflow_instructions = workflow_file.read_text()
+
+        prompt = f"""You are a Quality Review Agent in a data generation pipeline.
+
+{workflow_instructions}
+
+Current Task ID: {task_id}
+Task Data: {json.dumps(task['data'], indent=2)}
+
+Your goal is to:
+1. Review the datapoint for quality
+2. Make any necessary edits
+3. Re-validate after changes
+4. Approve or reject the datapoint
+
+Start working on this task now.
+"""
+
+        options = ClaudeAgentOptions(
+            model="sonnet",
+            cwd=str(self.workspace_dir),
+            allowed_tools=["Read", "Write", "Bash", "Glob", "Grep", "Edit"],
+        )
+
+        print(f"🤖 Running agent...")
+        messages = []
+
+        try:
+            async for message in query(prompt=prompt, options=options):
+                messages.append(message)
+
+                if hasattr(message, 'content'):
+                    for content_block in message.content:
+                        if hasattr(content_block, 'text') and content_block.text:
+                            print(f"   {content_block.text[:100]}...")
+
+            print(f"✅ Agent completed. Total messages: {len(messages)}")
+
+            return {
+                "status": "completed",
+                "task_id": task_id,
+                "message_count": len(messages)
+            }
+
+        except Exception as e:
+            print(f"❌ Error running agent: {e}")
+            self.task_manager.release_task(task_id, agent_id)
+            return {
+                "status": "error",
+                "task_id": task_id,
+                "error": str(e)
+            }
+
+    async def run_single_complete_pipeline(self):
+        """
+        Run one complete datapoint through the entire pipeline:
+        Idea Generation -> Building -> Review
+        """
+        print("\n" + "=" * 80)
+        print("🚀 Running Complete Pipeline for One Datapoint")
+        print("=" * 80)
+
+        results = {
+            "started_at": datetime.now().isoformat(),
+            "stages": {}
+        }
+
+        # Stage 1: Idea Generation
+        idea_result = await self.run_idea_agent("sdk_pipeline_idea_01")
+        results["stages"]["idea_generation"] = idea_result
+
+        if idea_result["status"] != "completed":
+            print("\n❌ Pipeline stopped: Idea generation failed")
+            return results
+
+        # Stage 2: Building
+        builder_result = await self.run_builder_agent("sdk_pipeline_builder_01")
+        results["stages"]["building"] = builder_result
+
+        if builder_result["status"] != "completed":
+            print("\n❌ Pipeline stopped: Building failed")
+            return results
+
+        # Stage 3: Review
+        review_result = await self.run_review_agent("sdk_pipeline_review_01")
+        results["stages"]["review"] = review_result
+
+        results["completed_at"] = datetime.now().isoformat()
+
+        print("\n" + "=" * 80)
+        print("✅ Complete Pipeline Finished!")
+        print("=" * 80)
+        print(json.dumps(results, indent=2))
+
+        return results
+
+    def get_pipeline_status(self):
+        """Get current pipeline status."""
+        return self.task_manager.get_status_summary()
+
+
+async def main():
+    """Main entry point for SDK-based pipeline."""
+    import argparse
+
+    parser = argparse.ArgumentParser(description="SDK-based Data Generation Pipeline")
+    parser.add_argument(
+        "--mode",
+        choices=["idea", "builder", "review", "complete"],
+        default="complete",
+        help="Which agent(s) to run"
+    )
+    parser.add_argument(
+        "--workspace",
+        default=None,
+        help="Workspace directory (defaults to current directory)"
+    )
+
+    args = parser.parse_args()
+
+    # Initialize pipeline
+    pipeline = SDKPipeline(workspace_dir=args.workspace)
+
+    # Show initial status
+    print("\n📊 Initial Pipeline Status:")
+    print(json.dumps(pipeline.get_pipeline_status(), indent=2))
+
+    # Run appropriate mode
+    if args.mode == "idea":
+        result = await pipeline.run_idea_agent()
+    elif args.mode == "builder":
+        result = await pipeline.run_builder_agent()
+    elif args.mode == "review":
+        result = await pipeline.run_review_agent()
+    elif args.mode == "complete":
+        result = await pipeline.run_single_complete_pipeline()
+
+    # Show final status
+    print("\n📊 Final Pipeline Status:")
+    print(json.dumps(pipeline.get_pipeline_status(), indent=2))
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

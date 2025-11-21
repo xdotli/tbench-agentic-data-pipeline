@@ -1,0 +1,12 @@
+{
+  "test_no_race_with_sequential_updates": 0.05,
+  "test_concurrent_updates_consistency": 0.20,
+  "test_concurrent_partition_simulation": 0.20,
+  "test_duplicate_event_not_double_processed": 0.10,
+  "test_concurrent_duplicate_handling": 0.10,
+  "test_serializable_isolation_prevents_lost_updates": 0.10,
+  "test_per_product_locking_prevents_hotspot_contention": 0.05,
+  "test_version_based_optimistic_locking": 0.05,
+  "test_offset_not_committed_before_db_write": 0.05,
+  "test_high_concurrent_load_no_corruption": 0.10
+}
