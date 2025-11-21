@@ -1,0 +1,401 @@
+#!/usr/bin/env python3
+"""
+Simplified SDK Demo for Data Generation Pipeline
+Demonstrates using Claude Agent SDK to automate a single datapoint generation.
+
+This is a minimal example that shows:
+1. How to use the SDK programmatically
+2. How to integrate with the existing pipeline structure
+3. How to run one complete task through the pipeline
+
+Usage:
+    export ANTHROPIC_API_KEY="your-key-here"
+    python3 sdk_demo_simple.py
+"""
+
+import asyncio
+import json
+import os
+import sys
+from pathlib import Path
+from datetime import datetime
+from dotenv import load_dotenv
+
+from claude_agent_sdk import query, ClaudeAgentOptions
+
+# Load .env file
+load_dotenv()
+
+
+async def generate_idea_with_sdk(seed_task_description: str, output_dir: Path):
+    """
+    Use SDK to generate a creative variation of a seed task.
+
+    This demonstrates:
+    - Setting up the SDK with appropriate options
+    - Providing context about the pipeline
+    - Letting Claude work with file operations
+    - Capturing the result
+    """
+    print("\n" + "=" * 80)
+    print("🎨 STAGE 1: Idea Generation (SDK-Powered)")
+    print("=" * 80)
+
+    # Ensure output directory exists
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create a prompt that mimics what an idea agent would receive
+    prompt = f"""You are an Idea Generation Agent for a data generation pipeline.
+
+**Your Task:**
+Generate 1 creative variation of this backend engineering task:
+
+```
+{seed_task_description}
+```
+
+**Requirements:**
+1. Create a NEW scenario that tests the same core skills but with:
+   - Different tech stack (e.g., if original uses Flask, try FastAPI or Express.js)
+   - Different domain (e.g., if original is e-commerce, try social media or IoT)
+   - Different complexity angle (e.g., add concurrency, caching, or auth challenges)
+
+2. Write a draft specification with:
+   - Title (1 line)
+   - Description (2-3 sentences)
+   - Target difficulty: ~20% pass rate for SOTA models
+   - Technologies involved
+   - Core skills being tested
+
+3. Save it to: {output_dir / "draft_spec.md"}
+
+Focus on backend software engineering: APIs, databases, debugging, testing, or refactoring.
+Make it realistic and challenging!
+"""
+
+    # Configure the agent
+    options = ClaudeAgentOptions(
+        model="sonnet",
+        cwd=str(Path.cwd()),
+        allowed_tools=["Write", "Read", "Bash"],
+    )
+
+    print("🤖 Starting SDK agent for idea generation...")
+    print(f"   Output directory: {output_dir}")
+
+    # Run the query
+    messages = []
+    try:
+        async for message in query(prompt=prompt, options=options):
+            messages.append(message)
+
+            # Print assistant responses
+            if hasattr(message, 'content'):
+                for block in message.content:
+                    if hasattr(block, 'text') and block.text:
+                        # Print snippets of the response
+                        lines = block.text.split('\n')
+                        for line in lines[:3]:  # First 3 lines
+                            if line.strip():
+                                print(f"   💭 {line[:70]}...")
+                                break
+
+        print(f"✅ Idea generation completed ({len(messages)} messages)")
+
+        # Check if the file was created
+        draft_file = output_dir / "draft_spec.md"
+        if draft_file.exists():
+            print(f"✅ Draft specification saved: {draft_file}")
+            print(f"   Size: {draft_file.stat().st_size} bytes")
+            return {"status": "success", "draft_file": str(draft_file)}
+        else:
+            print(f"⚠️  Warning: Expected file not found: {draft_file}")
+            return {"status": "partial", "message": "File not created"}
+
+    except Exception as e:
+        print(f"❌ Error during idea generation: {e}")
+        return {"status": "error", "error": str(e)}
+
+
+async def build_datapoint_with_sdk(draft_file: Path, output_dir: Path):
+    """
+    Use SDK to build a complete datapoint from a draft specification.
+    """
+    print("\n" + "=" * 80)
+    print("🔨 STAGE 2: Datapoint Building (SDK-Powered)")
+    print("=" * 80)
+
+    if not draft_file.exists():
+        print(f"❌ Draft file not found: {draft_file}")
+        return {"status": "error", "error": "Draft file missing"}
+
+    # Read the draft
+    draft_content = draft_file.read_text()
+
+    prompt = f"""You are a Datapoint Builder Agent for a data generation pipeline.
+
+**Your Task:**
+Build a complete, executable datapoint from this draft specification:
+
+```markdown
+{draft_content}
+```
+
+**What to create in {output_dir}:**
+
+1. **prompt.md** - A 1-3 sentence task description (as if from a product manager)
+   Example: "The API endpoint /users/:id times out when there are 100+ concurrent requests. Debug and fix the performance issue."
+
+2. **dockerfile** - Ubuntu 24.04 environment with all dependencies
+   Must include: language runtime, frameworks, database if needed
+
+3. **tests.py** - Pytest test functions that verify the solution
+   - Tests must FAIL initially (before fix)
+   - Tests must PASS after correct implementation
+   - Use clear, descriptive test names
+
+4. **weights.json** - Test importance weights that sum to 1.0
+   Example: {{"test_endpoint_performance": 0.5, "test_concurrent_requests": 0.5}}
+
+5. **files/** directory with initial broken code and any needed configs
+
+**Important:**
+- Make it realistic and challenging
+- Tests should fail in the initial state
+- Include detailed comments in code
+- Make sure weights.json sums to exactly 1.0
+
+Create all files now.
+"""
+
+    options = ClaudeAgentOptions(
+        model="sonnet",
+        cwd=str(Path.cwd()),
+        allowed_tools=["Write", "Read", "Bash", "Glob"],
+    )
+
+    print("🤖 Starting SDK agent for datapoint building...")
+    print(f"   Input: {draft_file}")
+    print(f"   Output: {output_dir}")
+
+    messages = []
+    try:
+        async for message in query(prompt=prompt, options=options):
+            messages.append(message)
+
+            if hasattr(message, 'content'):
+                for block in message.content:
+                    if hasattr(block, 'text') and block.text:
+                        lines = block.text.split('\n')
+                        for line in lines[:2]:
+                            if line.strip():
+                                print(f"   🔧 {line[:70]}...")
+                                break
+
+        print(f"✅ Datapoint building completed ({len(messages)} messages)")
+
+        # Check what was created
+        required_files = ["prompt.md", "dockerfile", "tests.py", "weights.json"]
+        created_files = []
+
+        for file in required_files:
+            file_path = output_dir / file
+            if file_path.exists():
+                created_files.append(file)
+                print(f"   ✅ {file} ({file_path.stat().st_size} bytes)")
+            else:
+                print(f"   ❌ {file} (missing)")
+
+        if len(created_files) == len(required_files):
+            return {"status": "success", "files_created": created_files}
+        else:
+            return {"status": "partial", "files_created": created_files}
+
+    except Exception as e:
+        print(f"❌ Error during building: {e}")
+        return {"status": "error", "error": str(e)}
+
+
+async def review_datapoint_with_sdk(datapoint_dir: Path):
+    """
+    Use SDK to review and validate a datapoint.
+    """
+    print("\n" + "=" * 80)
+    print("🔍 STAGE 3: Quality Review (SDK-Powered)")
+    print("=" * 80)
+
+    prompt = f"""You are a Quality Review Agent for a data generation pipeline.
+
+**Your Task:**
+Review the datapoint at: {datapoint_dir}
+
+**Check for:**
+
+1. **prompt.md** - Is it clear, concise (1-3 sentences), and realistic?
+2. **dockerfile** - Can it build successfully? Has all dependencies?
+3. **tests.py** - Are tests well-written and meaningful?
+4. **weights.json** - Do weights sum to exactly 1.0?
+5. **files/** - Is the initial code realistic and properly broken?
+
+**Your review process:**
+1. Read all files in the datapoint
+2. Check dockerfile can be built (or at least validate syntax)
+3. Verify weights sum to 1.0
+4. Assess overall quality
+
+**Provide a review:**
+- Overall quality score (1-10)
+- What's good
+- What needs improvement
+- Decision: APPROVE or NEEDS_WORK
+
+Be thorough but constructive!
+"""
+
+    options = ClaudeAgentOptions(
+        model="sonnet",
+        cwd=str(Path.cwd()),
+        allowed_tools=["Read", "Bash", "Glob"],
+    )
+
+    print("🤖 Starting SDK agent for quality review...")
+    print(f"   Reviewing: {datapoint_dir}")
+
+    messages = []
+    review_text = []
+
+    try:
+        async for message in query(prompt=prompt, options=options):
+            messages.append(message)
+
+            if hasattr(message, 'content'):
+                for block in message.content:
+                    if hasattr(block, 'text') and block.text:
+                        review_text.append(block.text)
+                        # Print review snippets
+                        lines = block.text.split('\n')
+                        for line in lines[:3]:
+                            if line.strip():
+                                print(f"   📝 {line[:70]}...")
+
+        print(f"✅ Review completed ({len(messages)} messages)")
+
+        # Determine if approved based on review text
+        full_review = '\n'.join(review_text)
+        approved = "APPROVE" in full_review.upper()
+
+        return {
+            "status": "success",
+            "approved": approved,
+            "review_length": len(full_review)
+        }
+
+    except Exception as e:
+        print(f"❌ Error during review: {e}")
+        return {"status": "error", "error": str(e)}
+
+
+async def run_complete_pipeline():
+    """
+    Run one complete datapoint through the entire SDK-powered pipeline.
+    """
+    print("\n" + "=" * 80)
+    print("🚀 SDK-POWERED DATA GENERATION PIPELINE DEMO")
+    print("=" * 80)
+    print(f"Started at: {datetime.now().isoformat()}")
+
+    # Example seed task from Terminal Bench
+    seed_task = """
+Debug a FastAPI application where the /api/orders endpoint returns incorrect
+data when multiple concurrent requests are made. The issue involves a race
+condition in the order processing logic. Fix the bug and add appropriate locking.
+"""
+
+    # Create workspace for this demo
+    workspace = Path.cwd() / "sdk_demo_output" / f"demo_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    workspace.mkdir(parents=True, exist_ok=True)
+
+    print(f"\n📁 Workspace: {workspace}")
+
+    results = {
+        "started_at": datetime.now().isoformat(),
+        "workspace": str(workspace),
+        "stages": {}
+    }
+
+    # STAGE 1: Idea Generation
+    idea_result = await generate_idea_with_sdk(seed_task, workspace)
+    results["stages"]["idea"] = idea_result
+
+    if idea_result["status"] != "success":
+        print("\n⚠️  Pipeline stopped after idea generation")
+        return results
+
+    # STAGE 2: Building
+    draft_file = Path(idea_result["draft_file"])
+    build_result = await build_datapoint_with_sdk(draft_file, workspace)
+    results["stages"]["build"] = build_result
+
+    if build_result["status"] not in ["success", "partial"]:
+        print("\n⚠️  Pipeline stopped after building")
+        return results
+
+    # STAGE 3: Review
+    review_result = await review_datapoint_with_sdk(workspace)
+    results["stages"]["review"] = review_result
+
+    results["completed_at"] = datetime.now().isoformat()
+
+    # Final summary
+    print("\n" + "=" * 80)
+    print("✅ PIPELINE COMPLETED!")
+    print("=" * 80)
+    print(json.dumps(results, indent=2))
+
+    print(f"\n📊 Summary:")
+    print(f"   Workspace: {workspace}")
+    print(f"   Idea: {idea_result['status']}")
+    print(f"   Build: {build_result['status']}")
+    print(f"   Review: {review_result['status']}")
+    if review_result.get("approved"):
+        print(f"   ✅ APPROVED for production")
+    else:
+        print(f"   📝 Needs more work")
+
+    return results
+
+
+async def main():
+    """Main entry point."""
+    # Check for API key
+    if not os.getenv("ANTHROPIC_API_KEY"):
+        print("=" * 80)
+        print("❌ ERROR: ANTHROPIC_API_KEY environment variable not set")
+        print("=" * 80)
+        print("\nPlease set your API key:")
+        print('  export ANTHROPIC_API_KEY="sk-ant-..."')
+        print("\nThen run this script again.")
+        sys.exit(1)
+
+    # Run the complete pipeline
+    try:
+        results = await run_complete_pipeline()
+
+        # Save results
+        output_file = Path("sdk_demo_output") / "latest_run.json"
+        output_file.parent.mkdir(exist_ok=True)
+        output_file.write_text(json.dumps(results, indent=2))
+        print(f"\n💾 Results saved to: {output_file}")
+
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Pipeline interrupted by user")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n\n❌ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

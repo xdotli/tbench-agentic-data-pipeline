@@ -31,10 +31,31 @@ https://github.com/user-attachments/assets/450cc73b-5316-46ea-a091-278690f4689d
 
 ---
 
+## 🚀 NEW: SDK Integration
+
+**Automate the pipeline programmatically** with Claude Agent SDK!
+
+```bash
+# Install SDK
+pip install claude-agent-sdk
+
+# Set API key
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Run automated pipeline
+./run_sdk_demo.sh
+```
+
+**📖 Documentation:**
+- **[docs/HARBOR_SDK_GUIDE.md](./docs/HARBOR_SDK_GUIDE.md)** - Complete Harbor format integration guide
+- **[STRUCTURE.md](./STRUCTURE.md)** - Repository organization guide
+
 ## 📚 Table of Contents
 
+- [NEW: SDK Integration](#-new-sdk-integration)
 - [See It In Action](#-see-it-in-action)
 - [High-Level Architecture](#-high-level-architecture)
+- [Repository Structure](#-repository-structure)
 - [Pipeline Results](#-pipeline-results)
 - [Agent Roles & Workflow](#-agent-roles--workflow)
   - [Idea Generation Agents](#-idea-generation-agents)
@@ -58,6 +79,31 @@ The pipeline transforms Terminal Bench evaluation tasks into diverse training da
 3. **Built datapoints** → **Review Agents** → Production-ready training data
 
 All agents work independently in parallel, coordinated by a central Task Manager that prevents duplication and handles failures.
+
+---
+
+## 📁 Repository Structure
+
+The repository is organized into clear functional areas:
+
+```
+.
+├── 🎯 Core Pipeline           # SDK generation & orchestration
+│   ├── data_pipeline.py       # Main pipeline orchestrator
+│   ├── sdk_agent_runner.py    # Training data format SDK
+│   └── sdk_harbor_runner.py   # Harbor evaluation format SDK
+│
+├── 🤖 agents/                 # Agent workspaces & instructions
+├── 🔧 shared_tools/           # Validation & utilities
+├── 📦 shared_workspace/       # Data exchange & outputs
+├── 🗂️ task_manager/           # Coordination system
+├── 💾 state/                  # Pipeline state
+├── 📊 jobs/                   # Test execution results
+├── 🔬 experiments/            # Tests, demos & archived code
+└── 📖 docs/                   # All documentation
+```
+
+**📖 See [STRUCTURE.md](./STRUCTURE.md) for complete directory documentation.**
 
 ---
 

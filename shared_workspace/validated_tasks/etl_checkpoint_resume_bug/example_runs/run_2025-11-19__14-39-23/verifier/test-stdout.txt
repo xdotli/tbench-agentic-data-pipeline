@@ -1,0 +1,89 @@
+Starting PostgreSQL...
+waiting for server to start.... stopped waiting
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-7.4.3, pluggy-1.6.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace
+plugins: asyncio-0.21.1
+asyncio: mode=Mode.STRICT
+collecting ... collected 5 items
+
+tests/test_outputs.py::test_full_migration_success PASSED                [ 20%]
+tests/test_outputs.py::test_checkpoint_resume_after_failure FAILED       [ 40%]
+tests/test_outputs.py::test_idempotent_batch_retry PASSED                [ 60%]
+tests/test_outputs.py::test_data_validation_and_error_handling PASSED    [ 80%]
+tests/test_outputs.py::test_exponential_backoff_retry PASSED             [100%]
+
+=================================== FAILURES ===================================
+_____________________ test_checkpoint_resume_after_failure _____________________
+tests/test_outputs.py:200: in test_checkpoint_resume_after_failure
+    assert orders_before_resume < num_orders  # Not all orders migrated yet
+E   assert 60 < 60
+------------------------------ Captured log call -------------------------------
+WARNING  app.migration_orchestrator:migration_orchestrator.py:105 Batch 2 failed (attempt 1/5): Simulated crash during orders migration
+WARNING  app.checkpoint:checkpoint.py:159 Error logged: system - Simulated crash during orders migration
+=============================== warnings summary ===============================
+app/models.py:11
+  /workspace/app/models.py:11: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    LegacyBase = declarative_base(metadata=MetaData(schema='public'))
+
+app/models.py:47
+  /workspace/app/models.py:47: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    NewBase = declarative_base(metadata=MetaData(schema='public'))
+
+app/transformers.py:19
+  /workspace/app/transformers.py:19: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    @validator('first_name', 'last_name')
+
+app/transformers.py:35
+  /workspace/app/transformers.py:35: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    @validator('total_amount')
+
+app/transformers.py:41
+  /workspace/app/transformers.py:41: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    @validator('status')
+
+app/transformers.py:58
+  /workspace/app/transformers.py:58: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    @validator('amount')
+
+app/transformers.py:64
+  /workspace/app/transformers.py:64: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    @validator('payment_method')
+
+tests/test_outputs.py: 125 warnings
+  /workspace/app/transformers.py:128: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    return transformed.dict(), None
+
+tests/test_outputs.py: 505 warnings
+  /usr/local/lib/python3.12/site-packages/pydantic/main.py:979: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    warnings.warn('The `dict` method is deprecated; use `model_dump` instead.', DeprecationWarning)
+
+tests/test_outputs.py: 77 warnings
+  /workspace/app/checkpoint.py:39: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    timestamp=datetime.utcnow()
+
+tests/test_outputs.py: 190 warnings
+  /workspace/app/transformers.py:154: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    return transformed.dict(), None
+
+tests/test_outputs.py: 190 warnings
+  /workspace/app/transformers.py:177: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    return transformed.dict(), None
+
+tests/test_outputs.py::test_checkpoint_resume_after_failure
+tests/test_outputs.py::test_idempotent_batch_retry
+tests/test_outputs.py::test_data_validation_and_error_handling
+tests/test_outputs.py::test_data_validation_and_error_handling
+tests/test_outputs.py::test_data_validation_and_error_handling
+tests/test_outputs.py::test_data_validation_and_error_handling
+tests/test_outputs.py::test_data_validation_and_error_handling
+tests/test_outputs.py::test_exponential_backoff_retry
+tests/test_outputs.py::test_exponential_backoff_retry
+  /workspace/app/checkpoint.py:154: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    timestamp=datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_outputs.py::test_checkpoint_resume_after_failure - assert 6...
+================== 1 failed, 4 passed, 1103 warnings in 5.09s ==================

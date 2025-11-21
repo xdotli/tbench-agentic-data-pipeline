@@ -1,0 +1,12 @@
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-sonnet-4-5
+
+tasks:
+  - path: shared_workspace/data_points/draft_dp_45e8bd02_harbor
+  - path: shared_workspace/data_points/draft_dp_39c98f01
+  - path: shared_workspace/data_points/draft_dp_e21289aa
+
+job_name: sdk_test_all_3_harbor_tasks
+n_attempts: 1
+timeout_multiplier: 2.0

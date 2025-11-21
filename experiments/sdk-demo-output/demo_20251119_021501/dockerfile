@@ -1,0 +1,65 @@
+FROM ubuntu:24.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV GO_VERSION=1.21.0
+ENV KAFKA_VERSION=3.6.0
+ENV POSTGRES_VERSION=15
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    build-essential \
+    ca-certificates \
+    openjdk-21-jre-headless \
+    postgresql-client \
+    python3 \
+    python3-pip \
+    python3-pytest \
+    netcat-traditional \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Go
+RUN wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz && \
+    rm go1.21.0.linux-amd64.tar.gz
+ENV PATH=$PATH:/usr/local/go/bin:/root/go/bin
+
+# Install Kafka
+RUN wget https://archive.apache.org/dist/kafka/3.6.0/kafka_2.13-3.6.0.tgz && \
+    tar -xzf kafka_2.13-3.6.0.tgz -C /opt && \
+    rm kafka_2.13-3.6.0.tgz && \
+    mv /opt/kafka_2.13-3.6.0 /opt/kafka
+ENV PATH=$PATH:/opt/kafka/bin
+
+# Install PostgreSQL server
+RUN apt-get update && apt-get install -y \
+    postgresql \
+    postgresql-contrib \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies for testing
+RUN pip3 install --no-cache-dir \
+    pytest \
+    pytest-timeout \
+    requests \
+    psycopg2-binary \
+    kafka-python
+
+# Create necessary directories
+RUN mkdir -p /root/go/src/inventory-service && \
+    mkdir -p /app && \
+    mkdir -p /var/lib/postgresql
+
+# Set working directory
+WORKDIR /app
+
+# Expose ports
+# Kafka: 9092, PostgreSQL: 5432, Custom service: 8080
+EXPOSE 9092 5432 8080
+
+# Default command
+CMD ["/bin/bash"]
