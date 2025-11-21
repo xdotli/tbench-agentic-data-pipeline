@@ -26,9 +26,6 @@ https://github.com/user-attachments/assets/6cf8819a-343a-4e03-9198-4979d4d160e5
 
 https://github.com/user-attachments/assets/450cc73b-5316-46ea-a091-278690f4689d
 
-
-![Pipeline Overview](./readme_images/pipeline-overview.png)
-
 ---
 
 ## 🚀 NEW: SDK Integration
@@ -143,8 +140,6 @@ The repository is organized into clear functional areas:
 ---
 
 ## 🔄 Agent Roles & Workflow
-
-![Single DP Journey](./readme_images/single-dp-journey.png)
 
 Each agent type operates independently with specialized tools and clear responsibilities:
 
