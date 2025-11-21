@@ -9,6 +9,7 @@ shared_workspace/validated_tasks/*/example_runs/
 
 # State files (runtime only)
 state/generation_state.json
+state/generation_state.lock
 
 # Python
 pycache/
