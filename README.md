@@ -1,294 +1,143 @@
-# 🤖 Terminal Bench Agentic Data Pipeline
+# Terminal Bench Agentic Data Pipeline
 
-**TL;DR:** A multi-agent system with 20+ Claude Code instances working in parallel to generate high-quality training data for terminal-based coding tasks, with focus on **backend software engineering** scenarios.
+Generate high-quality evaluation tasks in Harbor format using automated multi-agent pipeline.
 
-**Primary Focus: Backend Software Engineering**
+## What This Does
 
-This pipeline generates repository-level, realistic backend engineering tasks including:
-- API development (REST, GraphQL, WebSocket)
-- Database operations, migrations, and query optimization
-- Debugging and refactoring in complex codebases
-- Testing infrastructure (unit, integration, end-to-end)
-- Real-world developer scenarios targeting ~20% pass rate on SOTA models
+Generates **repository-level backend engineering tasks** for evaluating coding agents:
+- Real-world scenarios from actual open source repos and issues
+- Multi-file codebases (>1,000 LOC, >5 files)
+- Non-trivial bugs requiring exploration and problem-solving
+- Harbor format with build-then-break approach
 
-**Why build an agentic data pipeline?**
+## Quick Start
 
-Because generating quality training data for coding agents requires creativity, validation, and scale—tasks perfectly suited for AI collaboration.
+### 1. Create Seed Tasks
 
-## 🎬 See It In Action
-
-Watch 20+ agents working in parallel to generate training data at scale:
-
-### 20x agents in parallel
-https://github.com/user-attachments/assets/6cf8819a-343a-4e03-9198-4979d4d160e5
-
-### 6x agents in parallel (easier to follow!)
-
-https://github.com/user-attachments/assets/450cc73b-5316-46ea-a091-278690f4689d
-
----
-
-## 🚀 NEW: SDK Integration
-
-**Automate the pipeline programmatically** with Claude Agent SDK!
+First, create seed task specifications with your desired language distribution:
 
 ```bash
-# Install SDK
-pip install claude-agent-sdk
+# Default: 10 tasks (60% Python, 20% TypeScript, 10% JavaScript, 10% Go)
+cd experiments && PYTHONPATH=.. python create_seed_tasks.py
 
-# Set API key
-export ANTHROPIC_API_KEY="sk-ant-..."
+# Custom: 50 tasks with different distribution
+cd experiments && PYTHONPATH=.. python create_seed_tasks.py --count 50 \
+    --python 50 --typescript 30 --javascript 10 --go 10
 
-# Run automated pipeline
-./run_sdk_demo.sh
+# Python-only
+cd experiments && PYTHONPATH=.. python create_seed_tasks.py --count 20 --python 100
+
+# Include Rust and Java
+cd experiments && PYTHONPATH=.. python create_seed_tasks.py --count 30 \
+    --python 40 --typescript 20 --go 15 --rust 15 --java 10
 ```
 
-**📖 Documentation:**
-- **[docs/HARBOR_SDK_GUIDE.md](./docs/HARBOR_SDK_GUIDE.md)** - Complete Harbor format integration guide
-- **[STRUCTURE.md](./STRUCTURE.md)** - Repository organization guide
+### 2. Generate Harbor Tasks
 
-## 📚 Table of Contents
+Set your API key and run the SDK builder agent:
 
-- [NEW: SDK Integration](#-new-sdk-integration)
-- [See It In Action](#-see-it-in-action)
-- [High-Level Architecture](#-high-level-architecture)
-- [Repository Structure](#-repository-structure)
-- [Pipeline Results](#-pipeline-results)
-- [Agent Roles & Workflow](#-agent-roles--workflow)
-  - [Idea Generation Agents](#-idea-generation-agents)
-  - [Datapoint Builder Agents](#-datapoint-builder-agents)
-  - [Quality Review Agents](#-quality-review-agents)
-- [Task Manager System](#-task-manager-system)
-- [Datapoint Structure](#-datapoint-structure)
-- [Validation Pipeline](#-validation-pipeline)
-- [Infrastructure & Tools](#-infrastructure--tools)
-- [Getting Started](#-getting-started)
-- [Key Design Decisions](#-key-design-decisions)
+```bash
+export ANTHROPIC_API_KEY="your-key"
 
----
+# Generate one Harbor format task
+python sdk_harbor_runner.py --agent builder
 
-## 🏗️ High-Level Architecture
+# Generated tasks appear in: shared_workspace/data_points/
+```
 
-The pipeline transforms Terminal Bench evaluation tasks into diverse training datapoints through three specialized agent stages:
+### Test Generated Task
 
-1. **Seed tasks** from Terminal Bench → **Idea Agents** → Creative variations
-2. **Draft ideas** → **Builder Agents** → Complete executable datapoints  
-3. **Built datapoints** → **Review Agents** → Production-ready training data
+```bash
+harbor run shared_workspace/data_points/your_task/ \
+  --agent claude-code \
+  --environment docker
+```
 
-All agents work independently in parallel, coordinated by a central Task Manager that prevents duplication and handles failures.
-
----
-
-## 📁 Repository Structure
-
-The repository is organized into clear functional areas:
+## Repository Structure
 
 ```
 .
-├── 🎯 Core Pipeline           # SDK generation & orchestration
-│   ├── data_pipeline.py       # Main pipeline orchestrator
-│   ├── sdk_agent_runner.py    # Training data format SDK
-│   └── sdk_harbor_runner.py   # Harbor evaluation format SDK
-│
-├── 🤖 agents/                 # Agent workspaces & instructions
-├── 🔧 shared_tools/           # Validation & utilities
-├── 📦 shared_workspace/       # Data exchange & outputs
-├── 🗂️ task_manager/           # Coordination system
-├── 💾 state/                  # Pipeline state
-├── 📊 jobs/                   # Test execution results
-├── 🔬 experiments/            # Tests, demos & archived code
-└── 📖 docs/                   # All documentation
+├── sdk_harbor_runner.py       # Main: Generate Harbor tasks
+├── data_pipeline.py           # Task manager for parallel agents
+├── agents/                    # Agent workflow instructions
+│   ├── idea_agent_workspace/
+│   ├── dp_builder_workspace/
+│   └── review_agent_workspace/
+├── shared_workspace/
+│   ├── data_points/           # Generated tasks go here
+│   └── validated_tasks/       # 3 reference tasks
+├── shared_tools/              # Validation scripts
+└── docs/
+    ├── HARBOR_SDK_GUIDE.md    # Complete Harbor format guide
+    └── ENVIRONMENT_CONFIGURATION.md
 ```
 
-**📖 See [STRUCTURE.md](./STRUCTURE.md) for complete directory documentation.**
+## Agent Workflow
 
----
+1. **Idea Agent**: Generates task specifications from seed tasks
+2. **Builder Agent**: Builds working code → introduces bugs → packages in Harbor format
+3. **Review Agent**: Quality check before approval
 
-## 📈 Pipeline Configuration
-
-### Backend Engineering Focus
-- **Target Difficulty**: ~20% pass rate on SOTA models
-- **Languages**: Python, JavaScript, TypeScript
-- **Frameworks**: FastAPI, Flask, Django, Express.js, NestJS
-- **Databases**: PostgreSQL, MySQL, MongoDB, Redis
-- **Task Complexity**: Repository-level, multi-file codebases
-- **Scenario Types**: Real-world developer tasks (not toy projects)
-
-### Supported Categories
-
-| Category | Description |
-|----------|-------------|
-| API Development | REST APIs, GraphQL, WebSocket servers, middleware |
-| Backend Engineering | Microservices, server-side processing, concurrency |
-| Database Engineering | Migrations, schema design, query optimization |
-| Code Refactoring | Legacy code improvement, architecture changes |
-| Debugging | Multi-file bugs, race conditions, performance issues |
-| Integration Testing | Test infrastructure, mocking, fixtures |
-| Microservices | Multi-service architectures, service communication |
-| Security | Authentication, authorization, input validation |
-| Software Engineering | General engineering practices, design patterns |
-| Testing Infrastructure | Unit, integration, E2E test workflows |
-| Web Development | Full-stack features, server-side rendering |
-
-### Backend Technology Stack
-- **Python**: FastAPI, Flask, Django, SQLAlchemy, Pytest
-- **JavaScript/TypeScript**: Express.js, NestJS, Node.js, Jest, Mocha
-- **Databases**: PostgreSQL, MySQL, MongoDB, Redis, ORMs
-- **Testing**: Pytest, Jest, Mocha, integration test frameworks
-- **DevOps**: Docker containers, CI/CD workflows
-
----
-
-## 🔄 Agent Roles & Workflow
-
-Each agent type operates independently with specialized tools and clear responsibilities:
-
-### 🎨 Idea Generation Agents
-- **Input**: Seed tasks from Terminal Bench
-- **Process**: Analyze core skills → Generate n×multiplier variations → Select best ideas
-- **Output**: Draft specifications in shared workspace
-
-**Key Innovation**: Refinement criteria provided only AFTER brainstorming to maximize creativity
-
-### 🔨 Datapoint Builder Agents  
-- **Input**: Draft specifications from idea agents
-- **Process**: Build complete scenarios → Validate via software script → Iterate until passing
-- **Output**: Executable datapoints with all required components
-
-**Validation Requirements**:
-- ✅ Dockerfile builds successfully
-- ✅ Tests fail before agent intervention
-- ✅ All dependencies present
-- ✅ Test weights sum to 1.0
-
-### 🔍 Quality Review Agents
-- **Input**: Validated datapoints from builders
-- **Process**: Check quality standards → Edit if needed → Re-validate → Categorize
-- **Output**: Approved datapoints with metadata or rejection with reasons
-
----
-
-## 📊 Task Manager System
-
-The Task Manager enables parallel agent coordination without complex handoffs:
-
-```python
-# Agent claims work atomically
-task = tm.get_next_task("idea-agent-07", task_types=["generate_idea"])
-
-# Process independently
-draft_ideas = generate_creative_variations(task["seed_data"])
-
-# Complete with results
-tm.complete_task(task["id"], "idea-agent-07", {"drafts": draft_ideas})
-```
-
-**Features**:
-- Atomic task claiming (no collisions)
-- Automatic timeout recovery
-- Parent-child task tracking
-- Real-time status monitoring
-
----
-
-## 📁 Datapoint Structure
-
-Each training datapoint contains:
-
-```
-draft_001_a/
-├── prompt.md       # 1-3 sentence task (e.g., "Auth times out with 100+ users. Fix it.")
-├── dockerfile      # Ubuntu 24.04 (or similar) environment setup
-├── tests.py        # Pytest verification functions
-├── weights.json    # Test importance distribution
-└── files/          # Additional resources
-    ├── app.py      # Broken code to fix
-    └── config.json # Configuration files
-```
-
----
-
-## ✅ Validation Pipeline
-
-Shared validation tools ensure quality across all agents:
-
-1. **Docker Build**: Environment must build successfully
-2. **Test Discovery**: Pytest must find all test functions
-3. **Fail-First**: Tests must fail in initial state
-4. **Dependency Check**: All required packages present
-5. **Weight Validation**: Test weights sum to exactly 1.0
-
----
-
-## 🛠️ Infrastructure & Tools
-
-### Workspace Organization
-```
-agents/
-├── idea_agent_workspace/      # Idea generation tools & instructions
-├── dp_builder_workspace/      # Building tools & staging areas
-└── review_agent_workspace/    # Review tools & quality checks
-
-shared_workspace/              # Common filesystem for all agents
-shared_tools/                  # Validation, patching, utilities
-task_manager/                  # Coordination & state management
-```
-
-### Agent-Specific Tools
-- **Idea Agents**: `get_task_parameters.py`, `get_idea_refinement_details.py`
-- **Builder Agents**: `create_dp.py`, `add_dp_to_review.py`
-- **Review Agents**: `approve_datapoint.py`, `cancel_datapoint.py`, `show_categories_tags.py`
-
-### Shared Tools
-- `validate_datapoint.py` - Complete validation suite
-- `patch_dp.py` - Update datapoint components
-- `patch_additional_files.py` - Manage resource files
-
----
-
-## 🚀 Getting Started
-
+Run agents manually:
 ```bash
-# Clone repository
-git clone https://github.com/Danau5tin/tbench-agentic-data-pipeline.git
-cd tbench-agentic-data-pipeline
-
-# Install dependencies
-uv sync
-
-# Initialize seed tasks
-python init_seed_tasks.py <path_to_terminal_bench_tasks>
-
-# Launch agents with Claude Code
-# Idea Agent:
-"See @agents/idea_agent_workspace/workflow_instructions.md - you are the idea generation agent, go!"
-
-# Builder Agent:
-"See @agents/dp_builder_workspace/workflow_instructions.md - you are the datapoint builder agent, go!"
-
-# Review Agent:
-"See @agents/review_agent_workspace/workflow_instructions.md - you are the quality review agent, go!"
+# In Claude Code:
+"See @agents/dp_builder_workspace/workflow_instructions.md - you are the builder agent, go!"
 ```
 
+Or use SDK for automation:
+```bash
+python sdk_harbor_runner.py --agent all
+```
+
+## Quality Standards
+
+Tasks must be:
+- **Repo-level**: >1,000 LOC across >5 files (NOT single-file)
+- **Real-world**: Based on actual open source repos/issues (NOT toy projects)
+- **Non-trivial**: Require exploration and understanding (NOT one-line fixes)
+- **Backend focus**: API development, databases, testing, debugging
+
+## Task Categories
+
+Focus areas:
+- API development (REST, GraphQL, WebSocket)
+- Database operations (migrations, query optimization)
+- Testing infrastructure (unit, integration tests)
+- Debugging/refactoring (race conditions, performance)
+
+## Reference Tasks
+
+Use these 3 as templates:
+
+**auth_token_race_condition** (391 LOC, 5 files)
+- JWT refresh race condition
+- Non-atomic Redis operations
+
+**fix_async_worker_queue** (150 LOC, 1 file - expand this)
+- Async worker bugs
+- Multi-bug scenario
+
+**etl_checkpoint_resume_bug** (2,044 LOC, 14 files - perfect)
+- ETL checkpoint logic
+- Proper repo-level structure
+
+## Documentation
+
+- **[docs/HARBOR_SDK_GUIDE.md](docs/HARBOR_SDK_GUIDE.md)** - Complete Harbor format guide
+- **[docs/ENVIRONMENT_CONFIGURATION.md](docs/ENVIRONMENT_CONFIGURATION.md)** - Environment setup
+- **Agent instructions** - See `agents/*/workflow_instructions.md`
+
+## Current Status
+
+**Ready:**
+- ✅ 3 validated reference tasks
+- ✅ SDK automation working
+- ✅ Agent instructions updated for real-world focus
+
+**Todo:**
+- ⚠️ Replace 7 duplicate tasks in data_points/ with unique implementations
+- ⚠️ Generate 50+ tasks for production use
+
 ---
 
-## 💡 Key Design Decisions
-
-### Why Multiple Agent Types?
-- **Separation of concerns**: Each agent excels at one task
-- **Parallel scaling**: Multiple instances per type
-- **Quality gates**: Three-stage validation ensures high standards
-
-### Why Shared Filesystem?
-- **Simplicity**: No complex message passing
-- **Reliability**: File operations are atomic
-- **Debugging**: Easy to inspect intermediate states
-
-### Why Task Manager?
-- **Coordination**: Prevents duplicate work
-- **Recovery**: Handles agent failures gracefully
-- **Monitoring**: Real-time pipeline visibility
-
----
-
-**Built with Claude Code** 🤖 - This entire multi-agent system was developed using Claude Code, demonstrating the power of AI agents building infrastructure for other AI agents.
+**Built with Claude Code** - This multi-agent pipeline was developed using Claude Code
