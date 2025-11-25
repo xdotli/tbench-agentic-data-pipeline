@@ -83,7 +83,7 @@ shared_workspace/data_points/{task_id}/
    ```bash
    #!/bin/bash
    # Copy working implementation from reference
-   cp /solution/reference/checkout.py /workspace/app/checkout.py
+   cp /solution/reference/checkout.py /app/app/checkout.py
    # Restart service if needed
    systemctl restart app || true
    ```
@@ -97,18 +97,24 @@ shared_workspace/data_points/{task_id}/
 `tests/test.sh` must write reward to `/logs/verifier/reward.txt`:
 ```bash
 #!/bin/bash
-set -e
+# NOTE: Do NOT use 'set -e' - it prevents reward file from being written when tests fail
 
-# Run pytest
-cd /workspace
-pytest tests/test_outputs.py -v
+# Create logs directory
+mkdir -p /logs/verifier
 
-# Write reward (1 = pass, 0 = fail)
-if [ $? -eq 0 ]; then
+# Run pytest and capture exit code
+cd /app
+python -m pytest tests/test_outputs.py -v --tb=short
+TEST_EXIT_CODE=$?
+
+# Write reward based on exit code (1 = pass, 0 = fail)
+if [ $TEST_EXIT_CODE -eq 0 ]; then
     echo "1" > /logs/verifier/reward.txt
 else
     echo "0" > /logs/verifier/reward.txt
 fi
+
+exit 0  # Always exit 0 so Harbor gets the reward file
 ```
 
 ## Workflow Steps
@@ -171,11 +177,11 @@ This should be **trivially simple** - just restore working files:
 # solution/solve.sh
 
 # Copy correct implementation
-cp /solution/reference/checkout.py /workspace/app/checkout.py
+cp /solution/reference/checkout.py /app/app/checkout.py
 
 # Restart service
 pkill -f uvicorn
-/workspace/start.sh &
+/app/start.sh &
 sleep 5
 
 echo "Fixed race condition by restoring proper locking"
@@ -228,42 +234,50 @@ Update COPY paths to match Harbor structure:
 ```dockerfile
 FROM ghcr.io/laude-institute/t-bench/python-3-13:20250620
 
-WORKDIR /workspace
+WORKDIR /app
 
 # Copy dependencies
-COPY requirements.txt /workspace/
+COPY requirements.txt /app/
 RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
 
 # Copy broken application code
-COPY app/ /workspace/app/
-COPY init_db.py /workspace/
-COPY start.sh /workspace/
+COPY app/ /app/app/
+COPY init_db.py /app/
+COPY start.sh /app/
 
-RUN chmod +x /workspace/start.sh
+RUN chmod +x /app/start.sh
 
-CMD ["/workspace/start.sh"]
+CMD ["/app/start.sh"]
 ```
+
+**CRITICAL**: Ensure all startup scripts (start.sh, entrypoint.sh, etc.) use `/app` as the working directory, NOT `/workspace`!
 
 ### Step 8: Create tests/
 
 **tests/test.sh:**
 ```bash
 #!/bin/bash
-set -e
+# NOTE: Do NOT use 'set -e' - it prevents reward file from being written when tests fail
+
+# Create logs directory
+mkdir -p /logs/verifier
 
 # Setup test environment
 export TEST_DB_URL="postgresql://test:test@localhost/testdb"
 
-# Run tests
-cd /workspace
+# Run tests and capture exit code
+cd /app
 python -m pytest tests/test_outputs.py -v --tb=short
+TEST_EXIT_CODE=$?
 
-# Write reward based on result
-if [ $? -eq 0 ]; then
+# Write reward based on result (1 = pass, 0 = fail)
+if [ $TEST_EXIT_CODE -eq 0 ]; then
     echo "1" > /logs/verifier/reward.txt
 else
     echo "0" > /logs/verifier/reward.txt
 fi
+
+exit 0  # Always exit 0 so Harbor gets the reward file
 ```
 
 **tests/test_outputs.py:**

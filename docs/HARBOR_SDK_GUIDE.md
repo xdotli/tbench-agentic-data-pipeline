@@ -308,6 +308,20 @@ exit 0  # Always exit 0 so Harbor gets the reward file
 - Wait for services to be ready
 - Then start application
 
+### "DaytonaError: API key or JWT token is required"
+
+**Issue**: Using `daytona` environment without API key
+**Fix**:
+```bash
+# Option 1: Use docker environment (recommended for local)
+harbor run --env docker -p path/to/task
+
+# Option 2: Set Daytona API key (for cloud execution)
+export DAYTONA_API_KEY="your-api-key"
+harbor run --env daytona -p path/to/task
+```
+See [ENVIRONMENT_CONFIGURATION.md](./ENVIRONMENT_CONFIGURATION.md) for full details.
+
 ### "Model not found: claude-sonnet-4.5"
 
 **Issue**: Wrong model name format
@@ -377,10 +391,19 @@ The SDK uses the existing task manager:
 # Required
 export ANTHROPIC_API_KEY="sk-ant-..."
 
+# Optional - only needed if using Daytona environment
+# See docs/ENVIRONMENT_CONFIGURATION.md for details
+export DAYTONA_API_KEY="your-daytona-key"
+
 # Optional (defaults shown)
 export HARBOR_JOBS_DIR="jobs"
-export HARBOR_ENV_TYPE="docker"
+export HARBOR_ENV_TYPE="docker"  # Use "docker" for local, "daytona" for cloud
 ```
+
+**Important**: If you get `DaytonaError: API key or JWT token is required`:
+- You're using `--env daytona` without setting `DAYTONA_API_KEY`
+- Solution: Use `--env docker` (default) or set the API key
+- See [ENVIRONMENT_CONFIGURATION.md](./ENVIRONMENT_CONFIGURATION.md) for full details
 
 ### Task Manager
 

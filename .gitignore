@@ -41,12 +41,18 @@ test_api_key.py
 
 # Harbor test outputs (transient)
 jobs/
+shared_workspace/data_points/jobs/
 harbor_*.log
 *_test.log
 
-# Experiments - ignore transient outputs but keep demos
-experiments/abundant-demo/jobs/
+# Experiments - ignore transient outputs but keep scripts
+experiments/abundant-demo/
 experiments/sdk-demo-output/
+experiments/state/
 experiments/*.json
 experiments/*.txt
 experiments/*.log
+
+# Analysis notebooks and outputs
+*.ipynb_checkpoints/
+task_generation_analysis.ipynb

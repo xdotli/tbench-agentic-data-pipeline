@@ -9,81 +9,88 @@ from pathlib import Path
 from task_manager.task_manager import TaskManager
 
 def main():
-    # Initialize task manager
-    state_file = Path(__file__).parent / "state" / "generation_state.json"
+    # Initialize task manager - use same state file as data_pipeline.py
+    state_file = Path(__file__).parent.parent / "state" / "generation_state.json"
     tm = TaskManager(state_file)
 
     # Define 10 diverse backend engineering tasks
+    # Language distribution: 60% Python (6), 30% JavaScript/TypeScript (3), 10% Go (1)
+    # Category diversity: query optimization, migrations, testing, memory leaks, validation, refactoring
     tasks_data = [
+        # Python tasks (6)
         {
-            "task_name": "rate_limiting_api",
-            "description": "Implement rate limiting for API endpoints",
-            "complexity": "medium",
-            "category": "api_security",
-            "language": "python"
-        },
-        {
-            "task_name": "jwt_authentication",
-            "description": "Add JWT-based authentication to FastAPI service",
-            "complexity": "medium",
-            "category": "authentication",
-            "language": "python"
-        },
-        {
-            "task_name": "database_connection_pooling",
-            "description": "Implement efficient database connection pooling",
-            "complexity": "medium",
-            "category": "database",
-            "language": "python"
-        },
-        {
-            "task_name": "async_task_queue",
-            "description": "Build async task queue with Celery/Redis",
-            "complexity": "hard",
-            "category": "distributed_systems",
-            "language": "python"
-        },
-        {
-            "task_name": "caching_layer",
-            "description": "Add Redis caching layer to reduce database load",
+            "task_name": "n_plus_one_query_optimization",
+            "description": "Fix N+1 query problem causing slow API responses in Django ORM queries",
             "complexity": "medium",
             "category": "performance",
             "language": "python"
         },
         {
-            "task_name": "webhook_handler",
-            "description": "Implement webhook handler with retry logic",
-            "complexity": "medium",
-            "category": "integrations",
-            "language": "python"
-        },
-        {
-            "task_name": "data_validation_middleware",
-            "description": "Create middleware for request data validation",
-            "complexity": "easy",
-            "category": "api_design",
-            "language": "python"
-        },
-        {
-            "task_name": "batch_processing",
-            "description": "Implement batch processing for large datasets",
+            "task_name": "database_migration_rollback",
+            "description": "Fix broken database migration rollback that corrupts data",
             "complexity": "hard",
-            "category": "data_processing",
+            "category": "database_migrations",
             "language": "python"
         },
         {
-            "task_name": "api_versioning",
-            "description": "Add API versioning support to existing endpoints",
+            "task_name": "memory_leak_connection_pool",
+            "description": "Debug and fix memory leak in database connection pool cleanup",
             "complexity": "medium",
-            "category": "api_design",
+            "category": "memory_management",
             "language": "python"
         },
         {
-            "task_name": "pagination_system",
-            "description": "Implement cursor-based pagination for API",
+            "task_name": "flaky_integration_tests",
+            "description": "Fix flaky integration tests with race conditions in test fixtures",
             "complexity": "medium",
-            "category": "api_design",
+            "category": "testing",
             "language": "python"
+        },
+        {
+            "task_name": "circular_import_refactor",
+            "description": "Refactor circular dependencies causing import errors in microservice",
+            "complexity": "hard",
+            "category": "refactoring",
+            "language": "python"
+        },
+        {
+            "task_name": "api_validation_bypass",
+            "description": "Fix API endpoint accepting invalid input due to missing validation",
+            "complexity": "easy",
+            "category": "api_security",
+            "language": "python"
+        },
+
+        # JavaScript/TypeScript tasks (3)
+        {
+            "task_name": "express_middleware_memory_leak",
+            "description": "Fix memory leak in Express.js middleware not releasing event listeners",
+            "complexity": "medium",
+            "category": "memory_management",
+            "language": "typescript"
+        },
+        {
+            "task_name": "prisma_migration_conflict",
+            "description": "Resolve Prisma migration conflicts breaking database schema updates",
+            "complexity": "medium",
+            "category": "database_migrations",
+            "language": "typescript"
+        },
+        {
+            "task_name": "jest_mock_cleanup",
+            "description": "Fix Jest tests with mock state leaking between test suites",
+            "complexity": "easy",
+            "category": "testing",
+            "language": "javascript"
+        },
+
+        # Go task (1)
+        {
+            "task_name": "goroutine_leak_detection",
+            "description": "Debug and fix goroutine leak in HTTP client connection handling",
+            "complexity": "hard",
+            "category": "memory_management",
+            "language": "go"
         }
     ]
 
